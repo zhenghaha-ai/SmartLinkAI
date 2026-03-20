@@ -8,8 +8,7 @@ const props = defineProps({
 
 const emit = defineEmits(['submit'])
 
-// Form state
-const form = ref({
+const emptyForm = () => ({
   productName: '',
   brandName: '',
   intendedUse: '',
@@ -18,12 +17,28 @@ const form = ref({
   companyAddress: '',
   telephone: '',
   emergencyPhone: '',
+  // Section 9 physical & chemical
   appearance: '',
   colour: '',
   odour: '',
+  pH: '',
+  boilingPoint: '',
+  meltingPoint: '',
+  flashPoint: '',
+  density: '',
+  viscosity: '',
+  oxidising: '',
+  vapourPressure: '',
+  solubility: '',
+  vapourDensity: '',
+  partitionCoefficient: '',
+  ignitionTemperature: '',
+  evaporationRate: '',
+  UEL: '',
   ingredients: [{ component: '', casNumber: '', percentage: '' }]
 })
 
+const form = ref(emptyForm())
 const errors = ref({})
 
 function addIngredient() {
@@ -58,20 +73,7 @@ function handleSubmit() {
 }
 
 function handleReset() {
-  form.value = {
-    productName: '',
-    brandName: '',
-    intendedUse: '',
-    productType: '',
-    companyName: '',
-    companyAddress: '',
-    telephone: '',
-    emergencyPhone: '',
-    appearance: '',
-    colour: '',
-    odour: '',
-    ingredients: [{ component: '', casNumber: '', percentage: '' }]
-  }
+  form.value = emptyForm()
   errors.value = {}
 }
 </script>
@@ -79,10 +81,10 @@ function handleReset() {
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6">
 
-    <!-- Basic Info -->
+    <!-- Section 1: Basic Info -->
     <section>
       <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-3">
-        基本信息
+        Section 1 · 产品与公司信息
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div
@@ -113,11 +115,41 @@ function handleReset() {
       </div>
     </section>
 
-    <!-- Ingredients -->
+    <!-- Company Info -->
+    <section>
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-3">
+        供应商信息 (Supplier Details)
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div
+          v-for="field in SDS_FIELDS.company"
+          :key="field.key"
+          :class="field.key === 'companyAddress' ? 'sm:col-span-2' : ''"
+        >
+          <label class="block text-sm font-medium text-[var(--color-linear-text-secondary)] mb-1.5">
+            {{ field.label }}
+          </label>
+          <input
+            v-model="form[field.key]"
+            type="text"
+            :placeholder="field.placeholder"
+            class="w-full px-3 py-2 rounded-lg border text-sm
+                   bg-[var(--color-linear-surface)] text-[var(--color-linear-text)]
+                   border-[var(--color-linear-border)]
+                   placeholder-[var(--color-linear-text-tertiary)]
+                   focus:outline-none focus:ring-2 focus:ring-[var(--color-linear-accent)]/40
+                   focus:border-[var(--color-linear-accent)]
+                   transition-all duration-200"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Ingredients -->
     <section>
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)]">
-          成分信息 (Ingredients) *
+          Section 3 · 成分信息 (Composition / Ingredients) *
         </h3>
         <button
           type="button"
@@ -206,43 +238,20 @@ function handleReset() {
       </div>
     </section>
 
-    <!-- Company Info -->
+    <!-- Section 9: Physical & Chemical Properties -->
     <section>
-      <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-3">
-        公司信息
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-1">
+        Section 9 · 物理和化学属性（可选，填写可提升生成精度）
       </h3>
+      <p class="text-xs text-[var(--color-linear-text-tertiary)] mb-3">
+        留空时 AI 将根据成分自动推断，填写已知数据可让报告更准确
+      </p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div
-          v-for="field in SDS_FIELDS.company"
+          v-for="field in SDS_FIELDS.physical"
           :key="field.key"
-          :class="field.key === 'companyAddress' ? 'sm:col-span-2' : ''"
+          :class="field.fullWidth ? 'sm:col-span-2' : ''"
         >
-          <label class="block text-sm font-medium text-[var(--color-linear-text-secondary)] mb-1.5">
-            {{ field.label }}
-          </label>
-          <input
-            v-model="form[field.key]"
-            type="text"
-            :placeholder="field.placeholder"
-            class="w-full px-3 py-2 rounded-lg border text-sm
-                   bg-[var(--color-linear-surface)] text-[var(--color-linear-text)]
-                   border-[var(--color-linear-border)]
-                   placeholder-[var(--color-linear-text-tertiary)]
-                   focus:outline-none focus:ring-2 focus:ring-[var(--color-linear-accent)]/40
-                   focus:border-[var(--color-linear-accent)]
-                   transition-all duration-200"
-          />
-        </div>
-      </div>
-    </section>
-
-    <!-- Physical Properties -->
-    <section>
-      <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-3">
-        物理属性（可选）
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div v-for="field in SDS_FIELDS.physical" :key="field.key">
           <label class="block text-sm font-medium text-[var(--color-linear-text-secondary)] mb-1.5">
             {{ field.label }}
           </label>

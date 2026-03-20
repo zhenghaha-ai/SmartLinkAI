@@ -78,10 +78,24 @@ ${productData.ingredients.map((ing, i) =>
   `${i + 1}. ${ing.component} | CAS: ${ing.casNumber || 'N/A'} | ${ing.percentage}%`
 ).join('\n')}
 
-Physical:
-- Appearance: ${productData.appearance || 'Solid'}
-- Colour: ${productData.colour || 'N/A'}
-- Odour: ${productData.odour || 'N/A'}`
+Physical & Chemical Properties (use provided values; infer from ingredients if blank):
+- Appearance: ${productData.appearance || ''}
+- Colour: ${productData.colour || ''}
+- Odour: ${productData.odour || ''}
+- pH: ${productData.pH || ''}
+- Boiling point/range: ${productData.boilingPoint || ''}
+- Melting point/range: ${productData.meltingPoint || ''}
+- Flash point: ${productData.flashPoint || ''}
+- Density: ${productData.density || ''}
+- Viscosity: ${productData.viscosity || ''}
+- Oxidising properties: ${productData.oxidising || ''}
+- Vapour pressure: ${productData.vapourPressure || ''}
+- Solubility in water: ${productData.solubility || ''}
+- Vapour density: ${productData.vapourDensity || ''}
+- Partition coefficient (n-octanol/water): ${productData.partitionCoefficient || ''}
+- Ignition temperature: ${productData.ignitionTemperature || ''}
+- Evaporation rate: ${productData.evaporationRate || ''}
+- UEL (Upper Explosive Limit): ${productData.UEL || ''}`
 
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
