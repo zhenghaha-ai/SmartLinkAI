@@ -255,10 +255,12 @@ export async function generateWord(sds) {
         // ── Section 10 ────────────────────────────────────
         sectionHeading('10.  Stability and reactivity'),
         sectionTable([
-          fieldPara('Stability：', s10.stability),
-          fieldPara('Distribution of Ban：', s10.incompatibleMaterials),
-          fieldPara('Hazardous Polymerization：', s10.hazardousPolymerization),
-          fieldPara('Possibility of hazardous reactions：', s10.possibilityOfHazardousReactions),
+          fieldPara('Stability: ', s10.stability),
+          fieldPara('Conditions to avoid: ', s10.conditionsToAvoid),
+          fieldPara('Incompatible materials: ', s10.incompatibleMaterials),
+          fieldPara('Hazardous Polymerization: ', s10.hazardousPolymerization),
+          fieldPara('Decomposition products: ', s10.decompositionProducts),
+          fieldPara('Possibility of hazardous reactions: ', s10.possibilityOfHazardousReactions),
         ]),
 
         // ── Section 11 ────────────────────────────────────

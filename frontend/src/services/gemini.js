@@ -50,7 +50,7 @@ Return ONLY valid JSON with this exact structure (no markdown, no code blocks):
     "partitionCoefficient": "string", "ignitionTemperature": "string",
     "evaporationRate": "string", "UEL": "string"
   },
-  "section10": { "stability": "string", "incompatibleMaterials": "string", "hazardousPolymerization": "string", "possibilityOfHazardousReactions": "string" },
+  "section10": { "stability": "string", "conditionsToAvoid": "string", "incompatibleMaterials": "string", "hazardousPolymerization": "string", "decompositionProducts": "string", "possibilityOfHazardousReactions": "string" },
   "section11": { "acuteToxicity": "string", "chronicToxicity": "string", "irritation": "string", "sensitization": "string", "mutagenicity": "string", "carcinogenicity": "string" },
   "section12": { "ecologicalToxicity": "string", "persistenceDegradation": "string", "bioaccumulation": "string", "soilMigration": "string", "otherHarmfulEffects": "string" },
   "section13": { "disposalMethod": "string", "disposalConsiderations": "string" },
@@ -95,7 +95,52 @@ Physical & Chemical Properties (use provided values; infer from ingredients if b
 - Partition coefficient (n-octanol/water): ${productData.partitionCoefficient || ''}
 - Ignition temperature: ${productData.ignitionTemperature || ''}
 - Evaporation rate: ${productData.evaporationRate || ''}
-- UEL (Upper Explosive Limit): ${productData.UEL || ''}`
+- UEL (Upper Explosive Limit): ${productData.UEL || ''}
+
+Pre-filled section data (use EXACTLY if provided, otherwise generate from chemical knowledge):
+Section 10 - Stability & Reactivity:
+- Stability: ${productData.stability || ''}
+- Conditions to Avoid: ${productData.conditionsToAvoid || ''}
+- Incompatible materials: ${productData.incompatibleMaterials || ''}
+- Hazardous Polymerization: ${productData.hazardousPolymerization || ''}
+- Decomposition products: ${productData.decompositionProducts || ''}
+- Possibility of hazardous reactions: ${productData.possibilityOfHazardousReactions || ''}
+
+Section 11 - Toxicology:
+- Acute Toxicity: ${productData.acuteToxicity || ''}
+- Chronic Toxicity: ${productData.chronicToxicity || ''}
+- Irritation: ${productData.irritation || ''}
+- Sensitization: ${productData.sensitization || ''}
+- Mutagenicity: ${productData.mutagenicity || ''}
+- Carcinogenicity: ${productData.carcinogenicity || ''}
+
+Section 12 - Ecology:
+- Ecological toxicity: ${productData.ecologicalToxicity || ''}
+- Persistence and degradation: ${productData.persistenceDegradation || ''}
+- Bioaccumulation: ${productData.bioaccumulation || ''}
+- Soil migration: ${productData.soilMigration || ''}
+- Other harmful effects: ${productData.otherHarmfulEffects || ''}
+
+Section 13 - Disposal:
+- Disposal method: ${productData.disposalMethod || ''}
+- Disposal considerations: ${productData.disposalConsiderations || ''}
+
+Section 14 - Transport:
+- Transport standard: ${productData.iataInfo || ''}
+- UN Number: ${productData.unNumber || ''}
+- Risk classification: ${productData.riskClassification || ''}
+- Land Transport ADR/RID: ${productData.landTransport || ''}
+- Maritime Transport IMO/IMDG: ${productData.maritimeTransport || ''}
+- Air Transport IATA/ICAO: ${productData.airTransport || ''}
+- Packaging Information: ${productData.packagingInfo || ''}
+- Transport Fashion: ${productData.transportFashion || ''}
+- Transport Attentions: ${productData.transportAttentions || ''}
+
+Section 15 - Regulatory:
+- Regulatory Information: ${productData.regulatoryInfo || ''}
+
+Section 16 - Other:
+- References: ${productData.references || ''}`
 
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',

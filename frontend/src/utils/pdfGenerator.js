@@ -260,9 +260,11 @@ export async function generatePDF(sds) {
   // Section 10
   y = sectionTitle(doc, '10.  Stability and reactivity', y)
   y = sectionBox(doc, [
-    { label: 'Stability: ',                         value: s10.stability },
-    { label: 'Incompatible materials: ',            value: s10.incompatibleMaterials },
-    { label: 'Hazardous Polymerization: ',          value: s10.hazardousPolymerization },
+    { label: 'Stability: ',                          value: s10.stability },
+    { label: 'Conditions to avoid: ',               value: s10.conditionsToAvoid },
+    { label: 'Incompatible materials: ',             value: s10.incompatibleMaterials },
+    { label: 'Hazardous Polymerization: ',           value: s10.hazardousPolymerization },
+    { label: 'Decomposition products: ',             value: s10.decompositionProducts },
     { label: 'Possibility of hazardous reactions: ', value: s10.possibilityOfHazardousReactions },
   ], y)
 
