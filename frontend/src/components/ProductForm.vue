@@ -10,9 +10,27 @@ const emit = defineEmits(['submit'])
 
 const emptyForm = () => ({
   // Section 1
-  productName: '', brandName: '', intendedUse: '', productType: '',
+  issueDate: '', productName: '', brandName: '', intendedUse: '', productType: '',
   // Company
   companyName: '', companyAddress: '', telephone: '', emergencyPhone: '',
+  // Section 2
+  hazardClassification: '', signalWord: '', hazardStatements: '',
+  precautionaryStatement1: '', precautionaryStatement2: '',
+  precautionaryStatement3: '', precautionaryStatement4: '',
+  hazardResponse: '', hazardStorage: '', hazardDisposal: '',
+  // Section 3
+  ingredients: [{ component: '', casNumber: '', percentage: '' }],
+  // Section 4
+  firstAidSkin: '', firstAidEyes: '', firstAidInhalation: '', firstAidIngestion: '',
+  // Section 5
+  firefightingAgent: '', firefightingDanger: '', firefightingProtection: '',
+  // Section 6
+  releasePersonal: '', releaseEnvironmental: '', releaseCleanup: '',
+  // Section 7
+  handlingPrecautions: '', storageConditions: '',
+  // Section 8
+  exposureOEL: '', exposureBiological: '', exposureEngineering: '',
+  ppeFace: '', ppeSkin: '', ppeRespiratory: '', ppeThermal: '',
   // Section 9
   appearance: '', colour: '', odour: '', pH: '',
   boilingPoint: '', meltingPoint: '', flashPoint: '',
@@ -20,8 +38,8 @@ const emptyForm = () => ({
   solubility: '', vapourDensity: '', partitionCoefficient: '',
   ignitionTemperature: '', evaporationRate: '', UEL: '',
   // Section 10
-  stability: '', conditionsToAvoid: '', incompatibleMaterials: '',
-  hazardousPolymerization: '', decompositionProducts: '', possibilityOfHazardousReactions: '',
+  stability: '', materialsToAvoid: '', conditionsToAvoid: '', incompatibleMaterials: '',
+  hazardousPolymerization: '', decompositionProducts: '',
   // Section 11
   acuteToxicity: '', chronicToxicity: '', irritation: '',
   sensitization: '', mutagenicity: '', carcinogenicity: '',
@@ -38,8 +56,6 @@ const emptyForm = () => ({
   regulatoryInfo: '',
   // Section 16
   references: '',
-  // Section 3
-  ingredients: [{ component: '', casNumber: '', percentage: '' }]
 })
 
 const form = ref(emptyForm())
@@ -72,7 +88,7 @@ function handleReset() {
 
     <!-- Section 1: 基本信息 -->
     <section>
-      <h3 class="section-heading">Section 1 · 产品基本信息</h3>
+      <h3 class="section-heading">Section 1 · 产品标识</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div v-for="field in SDS_FIELDS.basic" :key="field.key"
              :class="field.key === 'productName' ? 'sm:col-span-2' : ''">
@@ -92,6 +108,21 @@ function handleReset() {
              :class="field.key === 'companyAddress' ? 'sm:col-span-2' : ''">
           <label class="field-label">{{ field.label }}</label>
           <input v-model="form[field.key]" type="text" :placeholder="field.placeholder" class="field-input" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: 危险标识 -->
+    <section>
+      <h3 class="section-heading">Section 2 · 危险标识</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-for="field in SDS_FIELDS.hazard" :key="field.key"
+             :class="['hazardStatements','hazardResponse','hazardStorage','hazardDisposal'].includes(field.key) ? 'sm:col-span-2' : ''">
+          <label class="field-label">{{ field.label }}</label>
+          <textarea v-if="['hazardStatements','hazardResponse','hazardStorage','hazardDisposal'].includes(field.key)"
+                    v-model="form[field.key]" :placeholder="field.placeholder" rows="2" class="field-textarea" />
+          <input v-else v-model="form[field.key]" type="text" :placeholder="field.placeholder" class="field-input" />
         </div>
       </div>
     </section>
@@ -132,10 +163,70 @@ function handleReset() {
       </div>
     </section>
 
+    <!-- Section 4: 急救措施 -->
+    <section>
+      <h3 class="section-heading">Section 4 · 急救措施</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-for="field in SDS_FIELDS.firstAid" :key="field.key">
+          <label class="field-label">{{ field.label }}</label>
+          <textarea v-model="form[field.key]" :placeholder="field.placeholder" rows="2" class="field-textarea" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: 消防措施 -->
+    <section>
+      <h3 class="section-heading">Section 5 · 消防措施</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-for="field in SDS_FIELDS.firefighting" :key="field.key">
+          <label class="field-label">{{ field.label }}</label>
+          <textarea v-model="form[field.key]" :placeholder="field.placeholder" rows="2" class="field-textarea" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: 泄漏应急处理 -->
+    <section>
+      <h3 class="section-heading">Section 6 · 泄漏应急处理</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-for="field in SDS_FIELDS.accidentalRelease" :key="field.key">
+          <label class="field-label">{{ field.label }}</label>
+          <textarea v-model="form[field.key]" :placeholder="field.placeholder" rows="2" class="field-textarea" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: 操作和储存 -->
+    <section>
+      <h3 class="section-heading">Section 7 · 操作和储存</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 gap-4">
+        <div v-for="field in SDS_FIELDS.handling" :key="field.key">
+          <label class="field-label">{{ field.label }}</label>
+          <textarea v-model="form[field.key]" :placeholder="field.placeholder" rows="2" class="field-textarea" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: 接触控制/个人防护 -->
+    <section>
+      <h3 class="section-heading">Section 8 · 接触控制 / 个人防护</h3>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-for="field in SDS_FIELDS.exposure" :key="field.key">
+          <label class="field-label">{{ field.label }}</label>
+          <input v-model="form[field.key]" type="text" :placeholder="field.placeholder" class="field-input" />
+        </div>
+      </div>
+    </section>
+
     <!-- Section 9: 物理化学属性 -->
     <section>
       <h3 class="section-heading">Section 9 · 物理和化学属性</h3>
-      <p class="text-xs text-[var(--color-linear-text-tertiary)] -mt-1 mb-3">留空时 AI 将根据成分自动推断，填写已知数据可让报告更准确</p>
+      <p class="optional-hint">选填，AI 将根据成分推断；填写可覆盖 AI 推断值</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div v-for="field in SDS_FIELDS.physical" :key="field.key"
              :class="field.fullWidth ? 'sm:col-span-2' : ''">
@@ -244,6 +335,8 @@ function handleReset() {
 </template>
 
 <style scoped>
+@reference "../style.css";
+
 .section-heading {
   @apply text-xs font-semibold uppercase tracking-widest text-[var(--color-linear-text-tertiary)] mb-3;
 }

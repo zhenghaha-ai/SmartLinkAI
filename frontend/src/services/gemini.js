@@ -1,5 +1,6 @@
 const BASE_URL = import.meta.env.VITE_GEMINI_BASE_URL || 'http://localhost:3001/v1'
 const MODEL    = import.meta.env.VITE_GEMINI_MODEL    || 'gemini-2.0-flash'
+const API_KEY  = import.meta.env.VITE_GEMINI_API_KEY  || ''
 
 const SYSTEM_PROMPT = `You are an expert chemist and safety professional specializing in Safety Data Sheets (SDS) compliant with OSHA 29 CFR 1910.1200 and GHS.
 
@@ -64,6 +65,7 @@ export async function generateSDS(productData) {
 
 Product Name: ${productData.productName}
 Brand: ${productData.brandName || 'N/A'}
+Issue Date: ${productData.issueDate || ''}
 Intended Use: ${productData.intendedUse || 'Consumer product'}
 Product Type: ${productData.productType || 'General consumer product'}
 
@@ -77,6 +79,49 @@ Ingredients:
 ${productData.ingredients.map((ing, i) =>
   `${i + 1}. ${ing.component} | CAS: ${ing.casNumber || 'N/A'} | ${ing.percentage}%`
 ).join('\n')}
+
+Pre-filled section data (use EXACTLY if provided, otherwise generate from chemical knowledge):
+
+Section 2 - Hazard Identification:
+- Hazard Classification: ${productData.hazardClassification || ''}
+- Signal Word: ${productData.signalWord || ''}
+- Hazard Statements: ${productData.hazardStatements || ''}
+- Precautionary Statement 1: ${productData.precautionaryStatement1 || ''}
+- Precautionary Statement 2: ${productData.precautionaryStatement2 || ''}
+- Precautionary Statement 3: ${productData.precautionaryStatement3 || ''}
+- Precautionary Statement 4: ${productData.precautionaryStatement4 || ''}
+- Response: ${productData.hazardResponse || ''}
+- Storage: ${productData.hazardStorage || ''}
+- Disposal: ${productData.hazardDisposal || ''}
+
+Section 4 - First Aid:
+- Skin Contact: ${productData.firstAidSkin || ''}
+- Eyes Contact: ${productData.firstAidEyes || ''}
+- Inhalation: ${productData.firstAidInhalation || ''}
+- Ingestion: ${productData.firstAidIngestion || ''}
+
+Section 5 - Firefighting:
+- Extinguishing Agent: ${productData.firefightingAgent || ''}
+- Special Danger: ${productData.firefightingDanger || ''}
+- Protective Measures: ${productData.firefightingProtection || ''}
+
+Section 6 - Accidental Release:
+- Personal Precautions: ${productData.releasePersonal || ''}
+- Environmental Precautions: ${productData.releaseEnvironmental || ''}
+- Cleanup Methods: ${productData.releaseCleanup || ''}
+
+Section 7 - Handling & Storage:
+- Safe Handling Precautions: ${productData.handlingPrecautions || ''}
+- Safe Storage Conditions: ${productData.storageConditions || ''}
+
+Section 8 - Exposure Controls/PPE:
+- Occupational Exposure Limit: ${productData.exposureOEL || ''}
+- Biological Limit Values: ${productData.exposureBiological || ''}
+- Engineering Controls: ${productData.exposureEngineering || ''}
+- Eye/Face Protection: ${productData.ppeFace || ''}
+- Skin Protection: ${productData.ppeSkin || ''}
+- Respiratory Protection: ${productData.ppeRespiratory || ''}
+- Thermal Hazards: ${productData.ppeThermal || ''}
 
 Physical & Chemical Properties (use provided values; infer from ingredients if blank):
 - Appearance: ${productData.appearance || ''}
@@ -97,14 +142,13 @@ Physical & Chemical Properties (use provided values; infer from ingredients if b
 - Evaporation rate: ${productData.evaporationRate || ''}
 - UEL (Upper Explosive Limit): ${productData.UEL || ''}
 
-Pre-filled section data (use EXACTLY if provided, otherwise generate from chemical knowledge):
 Section 10 - Stability & Reactivity:
 - Stability: ${productData.stability || ''}
+- Materials to Avoid: ${productData.materialsToAvoid || ''}
 - Conditions to Avoid: ${productData.conditionsToAvoid || ''}
 - Incompatible materials: ${productData.incompatibleMaterials || ''}
 - Hazardous Polymerization: ${productData.hazardousPolymerization || ''}
 - Decomposition products: ${productData.decompositionProducts || ''}
-- Possibility of hazardous reactions: ${productData.possibilityOfHazardousReactions || ''}
 
 Section 11 - Toxicology:
 - Acute Toxicity: ${productData.acuteToxicity || ''}
@@ -140,11 +184,15 @@ Section 15 - Regulatory:
 - Regulatory Information: ${productData.regulatoryInfo || ''}
 
 Section 16 - Other:
-- References: ${productData.references || ''}`
+- References: ${productData.references || ''}
+- Disclaimer: ${productData.disclaimer || ''}`
 
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {}),
+    },
     body: JSON.stringify({
       model: MODEL,
       messages: [
