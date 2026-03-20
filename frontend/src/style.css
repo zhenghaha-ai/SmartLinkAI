@@ -1,36 +1,71 @@
 @import "tailwindcss";
 
 @theme {
-  --color-linear-bg: #f8f9fc;
-  --color-linear-bg-secondary: #ffffff;
-  --color-linear-surface: #ffffff;
-  --color-linear-border: #e2e8f0;
-  --color-linear-text: #1a202c;
-  --color-linear-text-secondary: #64748b;
-  --color-linear-accent: #A78BFA;
-  --color-linear-accent-2: #F472B6;
+  /* Linear-inspired color tokens */
+  --color-linear-bg: #FAFAFA;
+  --color-linear-bg-secondary: #F4F4F5;
+  --color-linear-surface: #FFFFFF;
+  --color-linear-border: #E4E4E7;
+  --color-linear-border-subtle: #F4F4F5;
+  --color-linear-text: #18181B;
+  --color-linear-text-secondary: #71717A;
+  --color-linear-text-tertiary: #A1A1AA;
+  --color-linear-accent: #6366F1;
+  --color-linear-accent-hover: #4F46E5;
+  --color-linear-accent-subtle: #EEF2FF;
+  --color-linear-success: #10B981;
+  --color-linear-success-subtle: #ECFDF5;
+  --color-linear-warning: #F59E0B;
+  --color-linear-warning-subtle: #FFFBEB;
+  --color-linear-danger: #EF4444;
+  --color-linear-danger-subtle: #FEF2F2;
+
+  /* Dark theme overrides */
+  --color-linear-bg-dark: #0F0F11;
+  --color-linear-bg-secondary-dark: #18181B;
+  --color-linear-surface-dark: #1C1C1F;
+  --color-linear-border-dark: #27272A;
+  --color-linear-text-dark: #FAFAFA;
+  --color-linear-text-secondary-dark: #A1A1AA;
+  --color-linear-text-tertiary-dark: #71717A;
+  --color-linear-accent-subtle-dark: #1E1B4B;
 }
 
-[data-theme="dark"] {
-  --color-linear-bg: #0f1117;
-  --color-linear-bg-secondary: #1a1d27;
-  --color-linear-surface: #1e2130;
-  --color-linear-border: #2d3148;
-  --color-linear-text: #f1f5f9;
-  --color-linear-text-secondary: #94a3b8;
-}
+/* Base */
+*, *::before, *::after { box-sizing: border-box; }
 
-* { box-sizing: border-box; }
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
 body {
+  margin: 0;
   background-color: var(--color-linear-bg);
   color: var(--color-linear-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  margin: 0;
+  transition: background-color 0.2s, color 0.2s;
 }
 
+/* Dark theme */
+[data-theme="dark"] body {
+  background-color: var(--color-linear-bg-dark);
+  color: var(--color-linear-text-dark);
+}
+
+/* Animations */
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-in-up { animation: fade-in-up 0.35s ease both; }
+
+.fade-in-up {
+  animation: fade-in-up 0.25s ease both;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}

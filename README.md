@@ -1,100 +1,76 @@
-# SmartLinkAI — SDS Generator
+# SDS Generator — SmartLinkAI
 
-AI 驱动的美国安全数据表（SDS）生成工具，符合 OSHA 29 CFR 1910.1200 / GHS 标准。
+AI 驱动的安全数据表（SDS）自动生成工具。输入产品成分信息，AI 自动生成符合 OSHA 29 CFR 1910.1200 & GHS 标准的完整 SDS PDF 报告。
+
+**纯前端应用，无需后端，直接访问 URL 即可使用。**
+
+## 功能
+
+- **单品生成**：填写产品信息和成分，一键生成并下载 SDS PDF
+- **Excel 批量**：拖拽上传 Excel，逐行生成，实时进度显示
+- **AI 智能分析**：基于 CAS 编号自动判断危险等级、生成 GHS H/P code
+- **亮暗主题**：跟随系统偏好，支持手动切换
 
 ## 技术栈
 
-| 层 | 技术 |
-|---|---|
-| 前端 | Vue 3 + Vite + Tailwind CSS 4.x |
-| 后端 | Node.js + Express |
-| AI | Claude claude-sonnet-4-6 (Anthropic) |
-| 文档生成 | docx npm 包 |
+| 层级 | 技术 |
+|------|------|
+| 前端框架 | Vue 3 + Vite 7 + Tailwind CSS 4.x |
+| AI | Gemini 2.0 Flash（OpenAI-compatible 接口） |
+| PDF 生成 | jsPDF + jspdf-autotable（纯浏览器端） |
+| Excel 解析 | xlsx（纯浏览器端） |
+
+## 快速启动
+
+**双击 `start.bat`**（自动检查依赖、检测端口冲突、启动后自动打开浏览器）
+
+**手动启动：**
+```bash
+cd frontend
+npm install
+npx vite          # → http://localhost:5173
+```
+
+## 部署到公网
+
+构建后将 `dist/` 文件夹部署到任意静态托管：
+
+```bash
+cd frontend
+npm run build     # 输出到 dist/
+```
+
+- **Vercel**：拖拽 `dist/` 到 vercel.com 即可
+- **Nginx**：将 `dist/` 内容放到 web 根目录
+- **本地预览**：`npx serve dist`
 
 ## 目录结构
 
 ```
 SmartLinkAI/
-├── frontend/          # Vue 3 前端
-│   └── src/
-│       ├── App.vue
-│       ├── components/
-│       │   ├── ProductForm.vue      # 产品信息表单
-│       │   └── IngredientTable.vue  # 成分动态表格
-│       └── composables/
-│           └── useTheme.js          # 亮/暗主题切换
-├── backend/           # Express 后端
-│   ├── server.js
-│   ├── routes/generate.js           # POST /api/generate
-│   └── services/
-│       ├── claude.js                # Claude API 调用
-│       └── docxBuilder.js           # .docx 文件构建
-├── start.bat          # Windows 一键启动脚本
-└── README.md
+├── frontend/
+│   ├── .env.local              # API Key（不提交到 git）
+│   ├── src/
+│   │   ├── App.vue             # 主页面
+│   │   ├── services/gemini.js  # 直接调用 Gemini API
+│   │   ├── utils/pdfGenerator.js # jsPDF 生成 SDS PDF
+│   │   ├── components/
+│   │   │   ├── ProductForm.vue # 单品表单
+│   │   │   └── BatchUpload.vue # Excel 批量
+│   │   └── data/sdsFields.js   # 字段定义
+│   └── vite.config.js
+├── start.bat                   # Windows 一键启动
+└── US安全数据表模板（申诉用）.docx  # 参考模板
 ```
 
-## 启动方式
+## API 配置
 
-### 前置条件
+`frontend/.env.local`：
 
-- Node.js 18+
-- Anthropic API Key
-
-### 方式一：双击启动（推荐）
-
-1. 双击 `start.bat`
-2. 首次运行会提示输入 `ANTHROPIC_API_KEY`
-3. 自动安装依赖、启动前后端、打开浏览器
-
-### 方式二：手动启动
-
-```bash
-# 设置 API Key
-set ANTHROPIC_API_KEY=your_key_here
-
-# 启动后端（端口 3001）
-cd backend
-npm install
-node server.js
-
-# 启动前端（端口 5173，新终端）
-cd frontend
-npm install
-npm run dev
+```env
+VITE_GEMINI_API_KEY=your-api-key
+VITE_GEMINI_BASE_URL=https://api.tu-zi.com/v1
+VITE_GEMINI_MODEL=gemini-2.0-flash-preview
 ```
 
-访问 http://localhost:5173
-
-## 使用流程
-
-1. 填写产品名称（必填）、品牌名、用途
-2. 填写公司/供应商信息
-3. 在成分表中添加化学成分（名称、CAS 号、浓度）
-4. 点击 **Generate SDS Document**
-5. AI 自动推断危害分类、H 码、P 码及全部 16 节内容
-6. 自动下载 `.docx` 文件，用 Word 打开即可
-
-## 输出格式
-
-生成的 SDS 包含 OSHA 标准的 16 个章节：
-
-1. Identification
-2. Hazard(s) Identification（AI 推断 GHS 分类、信号词、H/P 码）
-3. Composition / Ingredients
-4. First-Aid Measures
-5. Fire-Fighting Measures
-6. Accidental Release Measures
-7. Handling and Storage
-8. Exposure Controls / Personal Protection
-9. Physical and Chemical Properties
-10. Stability and Reactivity
-11. Toxicological Information
-12. Ecological Information
-13. Disposal Considerations
-14. Transport Information
-15. Regulatory Information
-16. Other Information
-
-## 部署说明
-
-生产环境建议通过环境变量注入 `ANTHROPIC_API_KEY`，前端 build 后用 nginx 托管静态文件，后端用 PM2 守护进程。
+> ⚠️ 注意：前端直接调用 API，Key 会暴露在浏览器中，适用于内部工具。如需公开部署，请添加后端代理。

@@ -1,21 +1,25 @@
-import { ref } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 
 export function useTheme() {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const saved = localStorage.getItem('theme')
-  const isDark = ref(saved ? saved === 'dark' : prefersDark)
+  const isDark = ref(false)
 
-  function apply() {
+  onMounted(() => {
+    const stored = localStorage.getItem('theme')
+    if (stored) {
+      isDark.value = stored === 'dark'
+    } else {
+      isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
+  })
+
+  watchEffect(() => {
     document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
     localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  }
+  })
 
-  apply()
-
-  function toggle() {
+  function toggleTheme() {
     isDark.value = !isDark.value
-    apply()
   }
 
-  return { isDark, toggle }
+  return { isDark, toggleTheme }
 }

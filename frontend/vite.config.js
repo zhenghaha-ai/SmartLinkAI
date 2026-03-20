@@ -6,8 +6,19 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   server: {
     port: 5173,
-    proxy: {
-      '/api': 'http://localhost:3001'
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: '[name]-[hash].js',
+        chunkFileNames: '[name]-[hash].js',
+        assetFileNames: '[name]-[hash].[ext]',
+        manualChunks: {
+          vue: ['vue'],
+          pdf: ['jspdf', 'jspdf-autotable'],
+          xlsx: ['xlsx'],
+        },
+      }
     }
   }
 })

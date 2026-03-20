@@ -1,78 +1,65 @@
 @echo off
 chcp 65001 >nul
-title SmartLinkAI - SDS Generator
+title SDS Generator - SmartLinkAI
 
-echo ========================================
-echo   SmartLinkAI SDS Generator
-echo ========================================
+echo.
+echo ====================================
+echo   SDS Generator - SmartLinkAI
+echo ====================================
 echo.
 
-:: Check Node.js
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-  echo [ERROR] Node.js not found. Please install from https://nodejs.org
-  pause
-  exit /b 1
+  echo [ERROR] 未检测到 Node.js，请安装 Node.js 18+
+  pause & exit /b 1
 )
 
-:: Check ANTHROPIC_API_KEY
-if "%ANTHROPIC_API_KEY%"=="" (
-  echo [WARNING] ANTHROPIC_API_KEY is not set.
-  echo Please set it before running:
-  echo   set ANTHROPIC_API_KEY=your_key_here
-  echo.
-  set /p APIKEY="Enter your Anthropic API key: "
-  set ANTHROPIC_API_KEY=%APIKEY%
-)
-
-:: Install backend deps
-echo [1/3] Installing backend dependencies...
+echo [1/4] 检查后端依赖...
 cd /d "%~dp0backend"
 if not exist node_modules (
+  echo       安装中...
   call npm install
-)
+  if %errorlevel% neq 0 ( echo [ERROR] 后端依赖安装失败 & pause & exit /b 1 )
+) else ( echo       已就绪 )
 
-:: Install frontend deps
-echo [2/3] Installing frontend dependencies...
+echo [2/4] 检查前端依赖...
 cd /d "%~dp0frontend"
 if not exist node_modules (
+  echo       安装中...
   call npm install
-)
+  if %errorlevel% neq 0 ( echo [ERROR] 前端依赖安装失败 & pause & exit /b 1 )
+) else ( echo       已就绪 )
 
-:: Check port 3001
-echo [3/3] Checking ports...
-netstat -ano | findstr ":3001 " >nul 2>&1
-if %errorlevel% equ 0 (
-  echo [WARNING] Port 3001 is in use.
-  choice /c YN /m "Kill the process on port 3001?"
-  if errorlevel 2 goto :skip_kill
-  for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3001 "') do (
-    taskkill /PID %%a /F >nul 2>&1
-  )
-)
-:skip_kill
-
-:: Start backend
-echo.
-echo Starting backend on http://localhost:3001 ...
-cd /d "%~dp0backend"
-start "SmartLinkAI Backend" cmd /k "set ANTHROPIC_API_KEY=%ANTHROPIC_API_KEY% && node server.js"
-
-:: Wait a moment
+echo [3/4] 启动后端代理 (port 3001)...
+start "SDS-Backend" /d "%~dp0backend" cmd /k "node server.js"
 timeout /t 2 /nobreak >nul
 
-:: Start frontend
-echo Starting frontend on http://localhost:5173 ...
-cd /d "%~dp0frontend"
-start "SmartLinkAI Frontend" cmd /k "npm run dev"
+echo [4/4] 启动前端 (port 5173)...
+start "SDS-Frontend" /d "%~dp0frontend" cmd /k "npx vite"
 
-:: Wait then open browser
-timeout /t 3 /nobreak >nul
-start http://localhost:5173
+echo       等待服务就绪...
+:wait
+timeout /t 1 /nobreak >nul
+netstat -ano | findstr ":5173 " | findstr "LISTENING" >nul 2>&1
+if %errorlevel% neq 0 goto wait
 
 echo.
-echo ========================================
-echo   App running at http://localhost:5173
-echo   Press any key to exit this window
-echo ========================================
-pause >nul
+echo ====================================
+echo   启动成功！
+echo   访问: http://localhost:5173
+echo ====================================
+echo.
+set CHROME=
+for %%p in (
+  "%ProgramFiles%\Google\Chrome\Application\chrome.exe"
+  "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
+  "%LocalAppData%\Google\Chrome\Application\chrome.exe"
+) do (
+  if exist %%p set CHROME=%%p
+)
+if defined CHROME (
+  start "" %CHROME% http://localhost:5173
+) else (
+  start http://localhost:5173
+)
+pause
