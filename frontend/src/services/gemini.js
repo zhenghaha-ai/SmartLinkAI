@@ -6,6 +6,17 @@ const SYSTEM_PROMPT = `You are an expert chemist and safety professional special
 
 Given product information, generate a complete professional SDS. Base all hazard assessments on the actual chemical ingredients (CAS numbers and percentages).
 
+CRITICAL RULES:
+1. NEVER return empty strings for any field. Every field must have a value.
+2. For fields where the user provided data, use that data EXACTLY as provided.
+3. For optional fields where no user data is provided, use the standard default text below — do NOT generate custom content:
+   - Module 9 (Physical & Chemical Properties): use "N/A"
+   - Module 11 (Toxicological Information): use "No relevant data."
+   - Module 12 (Ecological Information): use "No relevant data."
+   - Module 16 references: use "GHS; OSHA 29 CFR 1910.1200"
+   - Module 16 disclaimer: use "The information in this SDS was obtained from sources believed to be reliable. It is provided in good faith and believed to be accurate. However, no representation, warranty or guarantee is made as to its completeness or accuracy. This information is supplied upon the condition that the persons receiving it will make their own determination of the suitability for their purposes prior to use."
+   - All other fields with no user data: use "No relevant data."
+
 Return ONLY valid JSON with this exact structure (no markdown, no code blocks):
 {
   "productName": "string",
@@ -22,6 +33,7 @@ Return ONLY valid JSON with this exact structure (no markdown, no code blocks):
   },
   "section2": {
     "hazardClassification": "string",
+    "hazardSymbol": "string",
     "signalWord": "Warning or Danger",
     "hazardStatements": ["H-code: description"],
     "precautionaryStatements": ["P-code: description"],
@@ -37,7 +49,7 @@ Return ONLY valid JSON with this exact structure (no markdown, no code blocks):
   "section4": { "skinContact": "string", "eyeContact": "string", "inhalation": "string", "ingestion": "string" },
   "section5": { "extinguishingAgent": "string", "specialDanger": "string", "protectiveMeasures": "string" },
   "section6": { "personalPrecautions": "string", "environmentalPrecautions": "string", "containmentMethods": "string" },
-  "section7": { "safeHandling": "string", "storageConditions": "string" },
+  "section7": { "safeHandling": "string", "storageConditions": "string", "storageIncompatibles": "string" },
   "section8": {
     "occupationalExposureLimit": "string", "biologicalLimitValues": "string",
     "engineeringControls": "string", "eyeFaceProtection": "string",
@@ -67,7 +79,6 @@ Product Name: ${productData.productName}
 Brand: ${productData.brandName || 'N/A'}
 Issue Date: ${productData.issueDate || ''}
 Intended Use: ${productData.intendedUse || 'Consumer product'}
-Product Type: ${productData.productType || 'General consumer product'}
 
 Company:
 - Name: ${productData.companyName || 'N/A'}
@@ -84,12 +95,10 @@ Pre-filled section data (use EXACTLY if provided, otherwise generate from chemic
 
 Section 2 - Hazard Identification:
 - Hazard Classification: ${productData.hazardClassification || ''}
+- Hazard Symbol: ${productData.hazardSymbol || ''}
 - Signal Word: ${productData.signalWord || ''}
 - Hazard Statements: ${productData.hazardStatements || ''}
-- Precautionary Statement 1: ${productData.precautionaryStatement1 || ''}
-- Precautionary Statement 2: ${productData.precautionaryStatement2 || ''}
-- Precautionary Statement 3: ${productData.precautionaryStatement3 || ''}
-- Precautionary Statement 4: ${productData.precautionaryStatement4 || ''}
+- Precautionary Statements: ${productData.precautionaryStatements || ''}
 - Response: ${productData.hazardResponse || ''}
 - Storage: ${productData.hazardStorage || ''}
 - Disposal: ${productData.hazardDisposal || ''}
@@ -113,6 +122,7 @@ Section 6 - Accidental Release:
 Section 7 - Handling & Storage:
 - Safe Handling Precautions: ${productData.handlingPrecautions || ''}
 - Safe Storage Conditions: ${productData.storageConditions || ''}
+- Incompatible materials for storage: ${productData.storageIncompatibles || ''}
 
 Section 8 - Exposure Controls/PPE:
 - Occupational Exposure Limit: ${productData.exposureOEL || ''}
@@ -144,11 +154,12 @@ Physical & Chemical Properties (use provided values; infer from ingredients if b
 
 Section 10 - Stability & Reactivity:
 - Stability: ${productData.stability || ''}
-- Materials to Avoid: ${productData.materialsToAvoid || ''}
+- Materials to Avoid (禁配物): ${productData.materialsToAvoid || ''}
 - Conditions to Avoid: ${productData.conditionsToAvoid || ''}
 - Incompatible materials: ${productData.incompatibleMaterials || ''}
 - Hazardous Polymerization: ${productData.hazardousPolymerization || ''}
 - Decomposition products: ${productData.decompositionProducts || ''}
+- Possibility of hazardous reactions: ${productData.possibilityOfHazardousReactions || ''}
 
 Section 11 - Toxicology:
 - Acute Toxicity: ${productData.acuteToxicity || ''}

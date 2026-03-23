@@ -187,6 +187,7 @@ export async function generatePDF(sds) {
   y = sectionTitle(doc, '2.  Hazards Identification', y)
   y = sectionBox(doc, [
     { label: 'Hazard classification according to 29 CFR 1910.1200: ', value: s2.hazardClassification },
+    { label: 'Hazard symbol/password: ',          value: s2.hazardSymbol },
     { label: 'Signal word: ',               value: s2.signalWord },
     { label: 'Hazard statements: ',         value: s2.hazardStatements },
     { label: 'Precautionary statements: ',  value: s2.precautionaryStatements },
@@ -230,6 +231,7 @@ export async function generatePDF(sds) {
   y = sectionBox(doc, [
     { label: 'Precautions for safe handling: ',                              value: s7.safeHandling },
     { label: 'Conditions for safe storage, including any incompatibilities: ', value: s7.storageConditions },
+    { label: 'Incompatible materials for storage: ',                         value: s7.storageIncompatibles },
   ], y)
 
   // Section 8

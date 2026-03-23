@@ -47,9 +47,24 @@ body {
 }
 
 /* Dark theme */
+[data-theme="dark"] {
+  --color-linear-bg: #0F0F11;
+  --color-linear-bg-secondary: #18181B;
+  --color-linear-surface: #1C1C1F;
+  --color-linear-border: #27272A;
+  --color-linear-border-subtle: #1C1C1F;
+  --color-linear-text: #FAFAFA;
+  --color-linear-text-secondary: #A1A1AA;
+  --color-linear-text-tertiary: #71717A;
+  --color-linear-accent-subtle: #1E1B4B;
+  --color-linear-success-subtle: #052e16;
+  --color-linear-warning-subtle: #451a03;
+  --color-linear-danger-subtle: #3f0606;
+}
+
 [data-theme="dark"] body {
-  background-color: var(--color-linear-bg-dark);
-  color: var(--color-linear-text-dark);
+  background-color: var(--color-linear-bg);
+  color: var(--color-linear-text);
 }
 
 /* Animations */
